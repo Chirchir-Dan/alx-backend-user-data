@@ -6,15 +6,9 @@ This module contains a function to obfuscate specific fields in log messages.
 import re
 from typing import List
 
-
-def filter_datum(
-        fields: List[str],
-        redaction: str,
-        message: str,
-        separator: str) -> str:
+def filter_datum(fields: List[str], redaction: str, message: str, separator: str) -> str:
     """
-    Replaces the values of specified fields in a log message with
-    a redaction string.
+    Replaces the values of specified fields in a log message with a redaction string.
 
     Args:
         fields (List[str]): List of field names to obfuscate.
@@ -25,6 +19,5 @@ def filter_datum(
     Returns:
         str: The log message with specified fields obfuscated.
     """
-    return re.sub(f'({"|".join(fields)})=([^;{
-                  separator
-                  }]+)', lambda m: f"{m.group(1)}={redaction}", message)
+    pattern = f'({"|".join(fields)})=([^;{separator}]+)'
+    return re.sub(pattern, lambda m: f"{m.group(1)}={redaction}", message)
