@@ -37,9 +37,9 @@ class Auth:
         Returns:
             str: None for now, logic will be added later
         """
-        if request is None or 'Authorizarion' not in request.headers:
+        if request is None:
             return None
-        return request.headers.get('Authorization')
+        return request.headers.get('Authorization', None)
 
     def current_user(self, request=None) -> TypeVar('User'):
         """
