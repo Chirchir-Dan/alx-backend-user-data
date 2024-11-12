@@ -118,3 +118,44 @@ class BasicAuth(Auth):
 
         # Return the user instance if email and password are valid
         return user[0]
+
+    def current_user(self, request=None) -> TypeVar('User'):
+        """
+        Retrieves the current User instance based on the Basic
+        Authentication credentials.
+
+        Args:
+            request (Flask request): The request object containing
+            the Authorization header.
+
+        Returns:
+            User: The User instance if the credentials are valid.
+            None: If the credentials are invalid or missing.
+        """
+        # Step 1: Retrieve the Authorization header
+        authorization_header = self.authorization_header(request)
+        if authorization_header is None:
+            return None
+
+        # Step 2: Extract the Base64 part from the Authorization header
+        base64_authorization_header = self.extract_base64_authorization_header(
+            authorization_header)
+        if base64_authorization_header is None:
+            return None
+
+        # Step 3: Decode the Base64 authorization header
+        decoded_base64_authorization_header = \
+            self.decode_base64_authorization_header(
+                base64_authorization_header)
+        if decoded_base64_authorization_header is None:
+            return None
+
+        # Step 4: Extract the user credentials (email and password)
+        user_email, user_pwd = self.extract_user_credentials(
+            decoded_base64_authorization_header)
+        if user_email is None or user_pwd is None:
+            return None
+
+        # Step 5: Retrieve the user object based on the email and password
+        user = self.user_object_from_credentials(user_email, user_pwd)
+        return user
