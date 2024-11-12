@@ -5,7 +5,8 @@ BasicAuth module for basic authentication.
 
 from api.v1.auth.auth import Auth
 import base64
-
+from typing import TypeVar
+from models.user import User
 
 class BasicAuth(Auth):
     """
@@ -82,3 +83,36 @@ class BasicAuth(Auth):
         user_email, user_password = decoded_base64_authorization_header.split(
             ':', 1)
         return user_email, user_password
+
+    def user_object_from_credentials(
+            self, user_email: str, user_pwd: str) -> TypeVar('User'):
+        """
+        Returns the User instance based on user email and password.
+
+        Args:
+            user_email (str): The user's email.
+            user_pwd (str): The user's password.
+
+        Returns:
+            User: The corresponding User instance if valid credentials
+            are provided.
+            None: If any validation fails (invalid email, password,
+            or user not found).
+        """
+        # Validate email and password types
+        if not isinstance(user_email, str) or not isinstance(user_pwd, str):
+            return None
+        
+        if user_email is None or user_pwd is None:
+            return None
+
+        # Lookup user by email
+        user = User.search({"email": user_email})
+        if not user:
+            return None  # No user found with this email
+
+        # Check if password matches
+        if not user[0].is_valid_password(user_pwd):
+            return None  # Password does not match
+
+        return user[0]  # Return the user instance if email and password are valid
