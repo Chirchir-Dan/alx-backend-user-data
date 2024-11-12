@@ -8,6 +8,7 @@ import base64
 from typing import TypeVar
 from models.user import User
 
+
 class BasicAuth(Auth):
     """
     BasicAuth class inherits from Auth.
@@ -102,7 +103,7 @@ class BasicAuth(Auth):
         # Validate email and password types
         if not isinstance(user_email, str) or not isinstance(user_pwd, str):
             return None
-        
+
         if user_email is None or user_pwd is None:
             return None
 
@@ -115,4 +116,5 @@ class BasicAuth(Auth):
         if not user[0].is_valid_password(user_pwd):
             return None  # Password does not match
 
-        return user[0]  # Return the user instance if email and password are valid
+        # Return the user instance if email and password are valid
+        return user[0]
