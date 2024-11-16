@@ -1,59 +1,77 @@
 #!/usr/bin/env python3
 """
-Authentication module
+Module with class Auth
 """
-
-from typing import List, TypeVar
+import fnmatch
 from flask import request
+from typing import List, TypeVar
+from os import getenv
 
 
 class Auth:
-    """Template class for API authentication"""
+    """ Class to manage API authentication"""
 
     def require_auth(self, path: str, excluded_paths: List[str]) -> bool:
-        """
-        Determines if a given path requires authentication.
+        """Determines if authentication is required for a given path.
 
         Args:
-            path (str): The requested path.
-            excluded_paths (List[str]): A list of paths that do not
-            require authentication.
+            path (str): The path to check.
+            excluded_paths (List[str]): List of paths that don't require auth.
 
         Returns:
             bool: True if authentication is required, False otherwise.
         """
-        if path is None or not excluded_paths:
+        if path is None:
+            return True
+        if not excluded_paths:
             return True
 
-        normalized_path = path if path.endswith('/') else f"{path}/"
-
-        for excluded_path in excluded_paths:
-            # Handle wildcards at the end of excluded paths
-            if excluded_path.endswith('*'):
-                if normalized_path.startswith(excluded_path[:-1]):
-                    return False
-                elif normalized_path == excluded_path:
-                    return False
+        for ex_path in excluded_paths:
+            if ex_path.endswith('*') and path.startswith(ex_path[:-1]):
+                return False
+            elif ex_path in {path, path + '/'}:
+                return False
         return True
 
     def authorization_header(self, request=None) -> str:
-        """
-        Retrieves the Authorization header from the Flask request
+        """Retrieves the authorization header from the request.
+
         Args:
-            request: Flask request object
+            request: The Flask request object.
+
         Returns:
-            str: None for now, logic will be added later
+            str: The value of the Authorization header, None, if not present.
         """
         if request is None:
             return None
-        return request.headers.get('Authorization', None)
+        return request.headers.get("Authorization", None)
 
     def current_user(self, request=None) -> TypeVar('User'):
-        """
-        Retrieves the current user based on the request
+        """Retrieves the authorization header from the request.
+        Currently returns None.
+
         Args:
-            request: Flask request object
+            request: The Flask request object.
+
         Returns:
-            TypeVar('User'): None for now, logic will be added later
+            str: None, as the implementation is incomplete.
         """
         return None
+
+    def session_cookie(self, request=None):
+        """Retrives the value of the cookie named by the SESSION_NAME
+        environment variable from the request.
+
+        Args:
+            request: The Flask request object to extract cookie from.
+
+        Returns:
+            str: The value of the session cookie, None if not present.
+        """
+        if request is None:
+            return None
+
+        # Get the session cookie from environment variable SESSION_NAME
+        session_name = getenv("SESSION_NAME", "_my_session_id")
+
+        return request.cookies.get(session_name)

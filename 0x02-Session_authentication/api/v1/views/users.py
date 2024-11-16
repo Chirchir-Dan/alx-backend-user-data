@@ -22,19 +22,19 @@ def view_one_user(user_id: str = None) -> str:
     Path parameter:
       - User ID
     Return:
-      - User object JSON represented
+      - If user_id is 'me', return the authenticated User.
+      - User object JSON represented by ID
       - 404 if the User ID doesn't exist
     """
+    # Handle 'me' user ID
+    if user_id == 'me':
+        if not request.current_user:
+            abort(404)  # No authenticated user
+        return jsonify(request.current_user.to_json())  # Authenticated user
+
+    # Handle regular user ID
     if user_id is None:
         abort(404)
-
-    # Handle special case for "me"
-    if user_id == "me":
-        if request.current_user is None:
-            abort(404)
-        return jsonify(request.current_user.to_json())
-
-    # Fetch the user by ID
     user = User.get(user_id)
     if user is None:
         abort(404)
