@@ -11,7 +11,6 @@ from sqlalchemy.orm.session import Session
 from user import Base, User
 
 
-
 class DB:
     """DB class
     """
