@@ -6,6 +6,7 @@ Auth module
 import bcrypt
 from db import DB
 from user import User
+from sqlalchemy.exc import NoResultFound
 
 
 class Auth:
@@ -45,7 +46,7 @@ class Auth:
         """
         # Check if the user already exists in the database
         try:
-            existing_user = self._db.find_user_by(email=email)
+            self._db.find_user_by(email=email)
             raise ValueError(f"User {email} already exists")
         except NoResultFound:
             # If the user doesn't exist, hash the password and create the new user
