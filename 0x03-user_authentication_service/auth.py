@@ -9,26 +9,25 @@ from user import User
 from sqlalchemy.exc import NoResultFound
 
 
+def _hash_password(self, password: str) -> bytes:
+    """
+    Hashes a password with a random salt using bcrypt.
+    Args:
+        password (str): The password to hash.
+    Returns:
+        bytes: The salted hash of the password.
+    """
+    salt = bcrypt.gensalt()
+    hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt)
+    return hashed_password
+
+
 class Auth:
     """Auth class to interact with the authentication database."""
 
     def __init__(self):
         """Initialize the Auth class with a database instance."""
         self._db = DB()
-
-    def _hash_password(self, password: str) -> bytes:
-        """
-        Hashes a password with a random salt using bcrypt.
-
-        Args:
-            password (str): The password to hash.
-
-        Returns:
-            bytes: The salted hash of the password.
-        """
-        salt = bcrypt.gensalt()
-        hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt)
-        return hashed_password
 
     def register_user(self, email: str, password: str) -> User:
         """
